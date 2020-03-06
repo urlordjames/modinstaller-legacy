@@ -15,6 +15,7 @@ public class Main {
     public static final int width = 500;
     public static final int height = 500;
     public JLabel text = null;
+    public Box box1;
 
     public static void main(String[] args) {
         Main main = new Main();
@@ -26,13 +27,30 @@ public class Main {
         f.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
         f.addWindowListener(new WindowAdapter(){ public void windowClosing( WindowEvent e ){ System.exit( 0 );}});
         f.setSize(width, height);
-        String packjson = getdog("http://173.255.230.249/zingot.json");
-        addtxt(jsonparse(packjson, "name"), f);
-        download(jsonparse(packjson, "scripts"), "scripts.zip");
+        TextField tf = new TextField("http://173.255.230.249/zingot.json");
+        Button button = new Button("click me to download");
+        box1 = Box.createVerticalBox();
+        box1.add(tf);
+        box1.add(button);
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                unpack(tf.getText());
+            }
+        });
+        f.add(box1);
+        addtxt("welcome to James' mod installer thing\nplease wait until it says\ndone before you close it");
         f.setVisible(true);
     }
 
-    public void unzip(File zipFile) {
+    public String unpack(String url) {
+        String packjson = getdog(url);
+        download(jsonparse(packjson, "scripts"), "scripts.zip");
+        //download(jsonparse(packjson, "mods"), "mods.zip"); //this is 100MB, disabled for testing
+        addtxt("done");
+        return jsonparse(packjson, "name");
+    }
+
+    public static void unzip(File zipFile) {
         LocalFileHeader localFileHeader;
         int readLen;
         byte[] readBuffer = new byte[4096];
@@ -51,13 +69,14 @@ public class Main {
         }
     }
 
-    public String jsonparse(String str, String key) {
+    public static String jsonparse(String str, String key) {
         return new JSONObject(str).getString(key);
     }
 
-    public void addtxt(String str, Frame f) {
+    public void addtxt(String str) {
         text = new JLabel(htmlformat(str));
-        f.add(text);
+        box1.add(text);
+        box1.revalidate();
     }
 
     public static String htmlformat(String text) {
@@ -92,6 +111,7 @@ public class Main {
             ReadableByteChannel rbc = Channels.newChannel(url.openStream());
             FileOutputStream fos = new FileOutputStream(outname);
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+            fos.close();
         } catch(Exception e) {
             e.printStackTrace();
         }
