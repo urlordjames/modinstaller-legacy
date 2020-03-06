@@ -2,12 +2,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.HttpURLConnection;
+import org.json.*;
 
 public class Main {
 
@@ -25,9 +24,17 @@ public class Main {
         f.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
         f.addWindowListener(new WindowAdapter(){ public void windowClosing( WindowEvent e ){ System.exit( 0 );}});
         f.setSize(width, height);
-        text = new JLabel(htmlformat(getdog("http://173.255.230.249/zingot.json")));
-        f.add(text);
+        addtxt(jsonparse(getdog("http://173.255.230.249/zingot.json"), "name"), f);
         f.setVisible(true);
+    }
+
+    public String jsonparse(String str, String key) {
+        return new JSONObject(str).getString(key);
+    }
+
+    public void addtxt(String str, Frame f) {
+        text = new JLabel(htmlformat(str));
+        f.add(text);
     }
 
     public static String htmlformat(String text) {
