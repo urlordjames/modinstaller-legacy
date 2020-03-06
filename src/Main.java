@@ -6,6 +6,8 @@ import java.net.URL;
 import java.net.HttpURLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
 import org.json.*;
 import net.lingala.zip4j.io.inputstream.ZipInputStream;
 import net.lingala.zip4j.model.LocalFileHeader;
@@ -44,13 +46,30 @@ public class Main {
 
     public String unpack(String url) {
         String packjson = getdog(url);
-        download(jsonparse(packjson, "scripts"), "scripts.zip");
-        //download(jsonparse(packjson, "mods"), "mods.zip"); //this is 100MB, disabled for testing
+        String mc = System.getenv("APPDATA") + "/.minecraft";
+        String modfolder = "/mods/" + jsonparse(packjson, "version");
+        try {
+            FileUtils.cleanDirectory(new File(mc + "/scripts"));
+            FileUtils.cleanDirectory(new File(mc + modfolder));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String zip = mc + "/scripts/scripts.zip";
+        System.out.println(zip);
+        download(jsonparse(packjson, "scripts"), zip);
+        unzip(zip);
+        new File(zip).delete();
+        zip = mc + modfolder + "/mods.zip";
+        System.out.println(zip);
+        download(jsonparse(packjson, "mods"), zip);
+        unzip(zip);
+        new File(zip).delete();
         addtxt("done");
         return jsonparse(packjson, "name");
     }
 
-    public static void unzip(File zipFile) {
+    public static void unzip(String zip) {
+        File zipFile = new File(zip);
         LocalFileHeader localFileHeader;
         int readLen;
         byte[] readBuffer = new byte[4096];
@@ -58,7 +77,7 @@ public class Main {
             ZipInputStream zipinstream = new ZipInputStream(fileInputStream);
             while ((localFileHeader = zipinstream.getNextEntry()) != null) {
                 File extractedFile = new File(localFileHeader.getFileName());
-                try (OutputStream outputStream = new FileOutputStream(extractedFile)) {
+                try (OutputStream outputStream = new FileOutputStream(zipFile.getParent() + "/" + extractedFile)) {
                     while ((readLen = zipinstream.read(readBuffer)) != -1) {
                         outputStream.write(readBuffer, 0, readLen);
                     }
