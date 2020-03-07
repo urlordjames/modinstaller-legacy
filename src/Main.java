@@ -7,7 +7,6 @@ import java.net.HttpURLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
 import org.json.*;
 import net.lingala.zip4j.io.inputstream.ZipInputStream;
 import net.lingala.zip4j.model.LocalFileHeader;
@@ -25,9 +24,9 @@ public class Main {
     }
 
     public void buildwindow() {
-        Frame f = new Frame("hello world");
+        Frame f = new Frame("Mod Updater/Installer");
         f.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        f.addWindowListener(new WindowAdapter(){ public void windowClosing( WindowEvent e ){ System.exit( 0 );}});
+        f.addWindowListener(new WindowAdapter(){ public void windowClosing( WindowEvent e ){ System.exit(0);}});
         f.setSize(width, height);
         TextField tf = new TextField("http://173.255.230.249/zingot.json");
         Button button = new Button("click me to download");
@@ -49,10 +48,13 @@ public class Main {
         String mc = System.getenv("APPDATA") + "/.minecraft";
         String modfolder = "/mods/" + jsonparse(packjson, "version");
         try {
+            new File(mc + "/scripts").mkdirs();
+            new File(mc + modfolder).mkdirs();
             FileUtils.cleanDirectory(new File(mc + "/scripts"));
             FileUtils.cleanDirectory(new File(mc + modfolder));
         } catch (Exception e) {
             e.printStackTrace();
+            System.exit(-1);
         }
         String zip = mc + "/scripts/scripts.zip";
         System.out.println(zip);

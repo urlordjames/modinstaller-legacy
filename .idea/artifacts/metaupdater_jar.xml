@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="metaupdater:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/metaupdater_jar</output-path>
+    <root id="archive" name="metaupdater.jar">
+      <element id="module-output" name="metaupdater" />
+    </root>
+  </artifact>
+</component>
