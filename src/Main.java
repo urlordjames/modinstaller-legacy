@@ -62,7 +62,7 @@ public class Main {
             e.printStackTrace();
             System.exit(-1);
         }
-        String zip = folder + "zip.zip";
+        String zip = folder + "/zip.zip";
         System.out.println(zip);
         download(url, zip);
         unzip(zip);
