@@ -47,27 +47,26 @@ public class Main {
         String packjson = getdog(url);
         String mc = System.getenv("APPDATA") + "/.minecraft";
         String modfolder = "/mods/" + jsonparse(packjson, "version");
+        dofolder(mc + "/scripts", jsonparse(packjson, "scripts"));
+        dofolder(mc + "/config", jsonparse(packjson, "config"));
+        dofolder(mc + modfolder, jsonparse(packjson, "mods"));
+        addtxt("done");
+        return jsonparse(packjson, "name");
+    }
+
+    public static void dofolder(String folder, String url) {
         try {
-            new File(mc + "/scripts").mkdirs();
-            new File(mc + modfolder).mkdirs();
-            FileUtils.cleanDirectory(new File(mc + "/scripts"));
-            FileUtils.cleanDirectory(new File(mc + modfolder));
+            new File(folder).mkdirs();
+            FileUtils.cleanDirectory(new File(folder));
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);
         }
-        String zip = mc + "/scripts/scripts.zip";
+        String zip = folder + "zip.zip";
         System.out.println(zip);
-        download(jsonparse(packjson, "scripts"), zip);
+        download(url, zip);
         unzip(zip);
         new File(zip).delete();
-        zip = mc + modfolder + "/mods.zip";
-        System.out.println(zip);
-        download(jsonparse(packjson, "mods"), zip);
-        unzip(zip);
-        new File(zip).delete();
-        addtxt("done");
-        return jsonparse(packjson, "name");
     }
 
     public static void unzip(String zip) {
