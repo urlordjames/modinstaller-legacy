@@ -6,6 +6,9 @@ import java.net.URL;
 import java.net.HttpURLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+
+import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.model.FileHeader;
 import org.apache.commons.io.FileUtils;
 import org.json.*;
 import net.lingala.zip4j.io.inputstream.ZipInputStream;
@@ -70,20 +73,10 @@ public class Main {
     }
 
     public static void unzip(String zip) {
-        File zipFile = new File(zip);
-        LocalFileHeader localFileHeader;
-        int readLen;
-        byte[] readBuffer = new byte[4096];
-        try (FileInputStream fileInputStream = new FileInputStream(zipFile)) {
-            ZipInputStream zipinstream = new ZipInputStream(fileInputStream);
-            while ((localFileHeader = zipinstream.getNextEntry()) != null) {
-                File extractedFile = new File(localFileHeader.getFileName());
-                try (OutputStream outputStream = new FileOutputStream(zipFile.getParent() + "/" + extractedFile)) {
-                    while ((readLen = zipinstream.read(readBuffer)) != -1) {
-                        outputStream.write(readBuffer, 0, readLen);
-                    }
-                }
-            }
+        ZipFile zipfile = new ZipFile(zip);
+        File file = zipfile.getFile();
+        try {
+            zipfile.extractAll(file.getParent());
         } catch (Exception e) {
             e.printStackTrace();
         }
