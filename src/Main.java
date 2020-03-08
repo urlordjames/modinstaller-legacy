@@ -2,17 +2,17 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.HttpURLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-
+import java.security.MessageDigest;
 import net.lingala.zip4j.ZipFile;
-import net.lingala.zip4j.model.FileHeader;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.json.*;
-import net.lingala.zip4j.io.inputstream.ZipInputStream;
-import net.lingala.zip4j.model.LocalFileHeader;
 
 public class Main {
 
@@ -52,9 +52,60 @@ public class Main {
         String modfolder = "/mods/" + jsonparse(packjson, "version");
         dofolder(mc + "/scripts", jsonparse(packjson, "scripts"));
         dofolder(mc + "/config", jsonparse(packjson, "config"));
-        dofolder(mc + modfolder, jsonparse(packjson, "mods"));
+        dohashed(mc + modfolder, jsonparse(packjson, "mods"));
         addtxt("done");
         return jsonparse(packjson, "name");
+    }
+
+    public static void dohashed(String folder, String url) {
+        try {
+            new File(folder).mkdirs();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+        String json = getdog(url);
+        JSONObject jsonhashes = new JSONObject(json);
+        JSONObject filehashes = new JSONObject();
+        File dir = new File(folder);
+        File[] files = dir.listFiles();
+        for (File file : files) {
+            String name = file.getName();
+            String sha = "";
+            try {
+                sha = sha256(new FileInputStream(file));
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.exit(-1);
+            }
+            filehashes.put(sha, name);
+        }
+        for (String hash : filehashes.keySet()) {
+            if (!inlist(jsonhashes, hash)) {
+                System.out.println("downloaded mod not in server list, deleting");
+                String delete = folder + "/" + filehashes.get(hash).toString();
+                System.out.println(delete);
+                new File(delete).delete();
+            }
+        }
+        for (String hash : jsonhashes.keySet()) {
+            if (!inlist(filehashes, hash)) {
+                System.out.println("missing mod, downloading");
+                String name = jsonhashes.get(hash).toString();
+                System.out.println(name);
+                try {
+                    download(name, folder + "/" + FilenameUtils.getName(new URL(name).getFile()));
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                    System.out.println("it would appear the server side list has an error, this isn't your fault, please wait for an update");
+                    System.exit(-1);
+                }
+            }
+        }
+    }
+
+    public static Boolean inlist(JSONObject haystack, String needle) {
+        return haystack.has(needle);
     }
 
     public static void dofolder(String folder, String url) {
@@ -87,6 +138,7 @@ public class Main {
     }
 
     public void addtxt(String str) {
+        System.out.println(str);
         text = new JLabel(htmlformat(str));
         box1.add(text);
         box1.revalidate();
@@ -118,6 +170,26 @@ public class Main {
         return "une error";
     }
 
+    public static String sha256(InputStream file) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] sha = digest.digest(IOUtils.toByteArray(file));
+            String shastring = bintohex(sha);
+            return shastring;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+        return "";
+    }
+
+    public static String bintohex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder(bytes.length * 2);
+        for(byte b: bytes)
+            sb.append(String.format("%02x", b));
+        return sb.toString();
+    }
+
     public static void download(String request, String outname) {
         try {
             URL url = new URL(request);
@@ -127,6 +199,7 @@ public class Main {
             fos.close();
         } catch(Exception e) {
             e.printStackTrace();
+            System.exit(-1);
         }
     }
 }
