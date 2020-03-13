@@ -18,8 +18,7 @@ public class Main {
 
     public static final int width = 500;
     public static final int height = 500;
-    public JLabel text = null;
-    public Box box1;
+    public Box textbox;
 
     public static void main(String[] args) {
         Main main = new Main();
@@ -33,7 +32,7 @@ public class Main {
         f.setSize(width, height);
         TextField tf = new TextField("http://173.255.230.249/zingot.json");
         Button button = new Button("click me to download");
-        box1 = Box.createVerticalBox();
+        Box box1 = Box.createVerticalBox();
         box1.add(tf);
         box1.add(button);
         button.addActionListener(new ActionListener() {
@@ -42,7 +41,9 @@ public class Main {
             }
         });
         f.add(box1);
-        addtxt("welcome to James' mod installer thing\nplease wait until it says\ndone before you close it");
+        textbox = Box.createVerticalBox();
+        f.add(textbox);
+        addtxt("welcome to James' mod installer thing please\nwait until it says done before you close it");
         f.setVisible(true);
     }
 
@@ -139,13 +140,12 @@ public class Main {
 
     public void addtxt(String str) {
         System.out.println(str);
-        text = new JLabel(htmlformat(str));
-        box1.add(text);
-        box1.revalidate();
+        textbox.add(new JLabel(htmlformat(str), JLabel.CENTER));
+        textbox.revalidate();
     }
 
     public static String htmlformat(String text) {
-        return "<html>" + text.replaceAll("\n", "<br>") + "</html>";
+        return "<html><div style='text-align: center;'>" + text.replaceAll("\n", "<br>") + "</div></html>";
     }
 
     public static String getdog(String request) {
