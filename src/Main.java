@@ -8,6 +8,8 @@ import java.net.HttpURLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.security.MessageDigest;
+import java.util.Set;
+
 import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -16,7 +18,7 @@ import org.json.*;
 
 public class Main {
 
-    public static final int width = 500;
+    public static final int width = 1000;
     public static final int height = 500;
     public Box textbox;
 
@@ -30,9 +32,11 @@ public class Main {
         f.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
         f.addWindowListener(new WindowAdapter(){ public void windowClosing( WindowEvent e ){ System.exit(0);}});
         f.setSize(width, height);
-        TextField tf = new TextField("http://173.255.230.249/zingot.json");
+        TextField tf = new TextField();
         Button button = new Button("click me to download");
         Box box1 = Box.createVerticalBox();
+        Box box2 = Box.createHorizontalBox();
+        Box box3 = Box.createVerticalBox();
         box1.add(tf);
         box1.add(button);
         button.addActionListener(new ActionListener() {
@@ -40,14 +44,43 @@ public class Main {
                 unpack(tf.getText());
             }
         });
-        f.add(box1);
+        box2.add(box1);
+        box2.add(Box.createRigidArea(new Dimension(150, 0)));
         textbox = Box.createVerticalBox();
-        f.add(textbox);
+        box2.add(textbox);
         addtxt("welcome to James' mod installer thing please\nwait until it says done before you close it");
+        box3.add(box2);
+        ScrollPane scrollpane = new ScrollPane();
+        JSONObject modpacks = new JSONObject(getdog("http://173.255.230.249/packs.json"));
+        String[] list = getpacks(modpacks);
+        tf.setText(modpacks.get(list[0]).toString());
+        JList modlist = new JList(list);
+        scrollpane.add(modlist);
+        box3.add(scrollpane);
+        Button button2 = new Button("select modpack");
+        button2.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int pos = modlist.getSelectedIndex();
+                System.out.println(pos);
+                tf.setText(modpacks.get(list[pos]).toString());
+            }
+        });
+        box3.add(button2);
+        f.add(box3);
         f.setVisible(true);
     }
 
-    public String unpack(String url) {
+    public static String[] getpacks(JSONObject json) {
+        Set<String> mods = json.keySet();
+        String[] modlist = new String[mods.size()];
+        int i = 0;
+        for (String mod : mods) {
+            modlist[i++] = mod;
+        }
+        return modlist;
+    }
+
+    public void unpack(String url) {
         String packjson = getdog(url);
         String mc = System.getenv("APPDATA") + "/.minecraft";
         String modfolder = "/mods/" + jsonparse(packjson, "version");
@@ -55,7 +88,7 @@ public class Main {
         dofolder(mc + "/config", jsonparse(packjson, "config"));
         dohashed(mc + modfolder, jsonparse(packjson, "mods"));
         addtxt("done");
-        return jsonparse(packjson, "name");
+        return;
     }
 
     public static void dohashed(String folder, String url) {
@@ -166,6 +199,7 @@ public class Main {
             return response.toString();
         } catch (Exception e) {
             e.printStackTrace();
+            System.exit(-1);
         }
         return "une error";
     }
