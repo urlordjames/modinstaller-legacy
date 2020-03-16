@@ -9,7 +9,6 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.security.MessageDigest;
 import java.util.Set;
-
 import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -88,7 +87,6 @@ public class Main {
         dofolder(mc + "/config", jsonparse(packjson, "config"));
         dohashed(mc + modfolder, jsonparse(packjson, "mods"));
         addtxt("done");
-        return;
     }
 
     public static void dohashed(String folder, String url) {
@@ -119,7 +117,16 @@ public class Main {
                 System.out.println("downloaded mod not in server list, deleting");
                 String delete = folder + "/" + filehashes.get(hash).toString();
                 System.out.println(delete);
-                new File(delete).delete();
+                try {
+                    boolean success = new File(delete).delete();
+                    if (!success) {
+                        System.out.println("ERROR: file deletion failed (for some unknown reason)");
+                        System.exit(-1);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.exit(-1);
+                }
             }
         }
         for (String hash : jsonhashes.keySet()) {
@@ -154,7 +161,11 @@ public class Main {
         System.out.println(zip);
         download(url, zip);
         unzip(zip);
-        new File(zip).delete();
+        boolean delete = new File(zip).delete();
+        if (!delete) {
+            System.out.println("ERROR: file deletion failed (for some unknown reason)");
+            System.exit(-1);
+        }
     }
 
     public static void unzip(String zip) {

@@ -2,7 +2,7 @@ import hashlib
 import os
 import json
 
-url = "http://173.255.230.249/zingot/mods/mods/"
+url = "http://173.255.230.249/newpack/mods/mods/"
 
 list = {}
 
