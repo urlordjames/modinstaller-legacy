@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.HttpURLConnection;
 import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.security.MessageDigest;
 import java.util.Set;
@@ -105,7 +106,9 @@ public class Main {
             String name = file.getName();
             String sha = "";
             try {
-                sha = sha256(new FileInputStream(file));
+                FileInputStream filetohash = new FileInputStream(file);
+                sha = sha256(filetohash);
+                filetohash.close();
             } catch (Exception e) {
                 e.printStackTrace();
                 System.exit(-1);
@@ -240,7 +243,9 @@ public class Main {
             URL url = new URL(request);
             ReadableByteChannel rbc = Channels.newChannel(url.openStream());
             FileOutputStream fos = new FileOutputStream(outname);
-            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+            FileChannel channel = fos.getChannel();
+            channel.transferFrom(rbc, 0, Long.MAX_VALUE);
+            channel.close();
             fos.close();
         } catch(Exception e) {
             e.printStackTrace();
