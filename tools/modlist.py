@@ -1,15 +1,16 @@
-import hashlib
-import os
-import json
+from hashlib import sha256
+from os import listdir
+from json import dumps
 
-list = {}
+url = "https://jamesvps.tk/mods/jarbin/"
 
-for name in os.listdir("mods"):
-    with open("mods/" + name, "rb") as f:
-        sha = hashlib.sha256()
+modlist = {}
+
+for name in listdir("mods"):
+    with open(f"mods/{name}", "rb") as f:
+        sha = sha256()
         sha.update(f.read())
-    list.update({sha.hexdigest(): f"https://jamesvps.tk/mods/jarbin/{name}"})
+    modlist.update({sha.hexdigest(): url + name})
 
-f = open("list.json", "w")
-f.write(json.dumps(list))
-f.close()
+with open("list.json", "w") as f:
+    f.write(dumps(modlist))
