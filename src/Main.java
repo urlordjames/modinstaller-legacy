@@ -51,7 +51,7 @@ public class Main {
         addtxt("welcome to James' mod installer thing please\nwait until it says done before you close it");
         box3.add(box2);
         ScrollPane scrollpane = new ScrollPane();
-        JSONObject modpacks = new JSONObject(getdog("http://173.255.230.249/packs.json"));
+        JSONObject modpacks = new JSONObject(getdog("https://jamesvps.tk/static/mods/packs.json"));
         String[] list = getpacks(modpacks);
         tf.setText(modpacks.get(list[0]).toString());
         JList modlist = new JList(list);

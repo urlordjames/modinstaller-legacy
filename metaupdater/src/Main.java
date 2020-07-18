@@ -17,7 +17,7 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        download("http://173.255.230.249/modinstaller.jar", "install.jar");
+        download("https://jamesvps.tk/static/mods/modinstaller.jar", "install.jar");
     }
 
     public void run() {
