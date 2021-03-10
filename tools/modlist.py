@@ -2,7 +2,7 @@ from hashlib import sha256
 from os import listdir
 from json import dumps
 
-url = "https://jamesvps.tk/mods/jarbin/"
+url = "https://jamesvps.tk/static/mods/pack2/mods/"
 
 modlist = {}
 

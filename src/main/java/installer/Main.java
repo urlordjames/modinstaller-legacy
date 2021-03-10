@@ -94,7 +94,9 @@ public class Main {
     public void unpack(String url) {
         String packjson = getdog(url);
         String mc = getMinecraftPath();
-        String modfolder = "/mods/" + jsonparse(packjson, "version");
+        String v = jsonparse(packjson, "version");
+        String modfolder = "/mods";
+        if (!v.equals("none")) modfolder += "/" + v;
         dofolder(mc + "/scripts", jsonparse(packjson, "scripts"));
         dofolder(mc + "/config", jsonparse(packjson, "config"));
         dohashed(mc + modfolder, jsonparse(packjson, "mods"));
