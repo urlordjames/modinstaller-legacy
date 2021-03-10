@@ -82,9 +82,18 @@ public class Main {
         return modlist;
     }
 
+    public String getMinecraftPath() {
+      String name = System.getProperty("os.name");
+      if (name.startsWith("Windows")) {
+          return System.getenv("APPDATA") + "/.minecraft";
+      } else if (name.startsWith("Mac") || name.startsWith("Darwin")) {
+          return System.getProperty("user.home") + "/Library/Application Support/minecraft";
+      } else return System.getProperty("user.home") + "/.minecraft";
+    }
+
     public void unpack(String url) {
         String packjson = getdog(url);
-        String mc = System.getenv("APPDATA") + "/.minecraft";
+        String mc = getMinecraftPath();
         String modfolder = "/mods/" + jsonparse(packjson, "version");
         dofolder(mc + "/scripts", jsonparse(packjson, "scripts"));
         dofolder(mc + "/config", jsonparse(packjson, "config"));
