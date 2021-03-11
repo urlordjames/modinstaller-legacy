@@ -119,6 +119,7 @@ public class Main {
             String name = file.getName();
             String sha = "";
             try {
+                if (file.isDirectory()) continue;
                 FileInputStream filetohash = new FileInputStream(file);
                 sha = sha256(filetohash);
                 filetohash.close();
@@ -134,7 +135,7 @@ public class Main {
                 String delete = folder + "/" + filehashes.get(hash).toString();
                 System.out.println(delete);
                 try {
-                    boolean success = new File(delete).delete();
+                    boolean success = FileUtils.deleteQuietly(new File(delete));
                     if (!success) {
                         System.out.println("ERROR: file deletion failed (for some unknown reason)");
                         System.exit(-1);
